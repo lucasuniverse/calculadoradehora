@@ -22,14 +22,14 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 100%;
-            box-sizing: border-box; /* Ensure padding and border are included in the total width */
+            box-sizing: border-box;
         }
         h1 {
             text-align: center;
         }
         .form-group {
             margin-bottom: 15px;
-            width: 100%; /* Ensure form group takes the full width */
+            width: 100%;
         }
         label {
             display: block;
@@ -40,7 +40,7 @@
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box; /* Ensure padding and border are included in the total width */
+            box-sizing: border-box;
         }
         button {
             margin-top: 15px;
@@ -61,8 +61,8 @@
             border: 1px solid #b3d4fc;
             border-radius: 4px;
             width: 100%;
-            min-height: 100px; /* Set a minimum height */
-            box-sizing: border-box; /* Ensure padding and border are included in the total width */
+            min-height: 100px;
+            box-sizing: border-box;
         }
         .info p {
             margin: 5px 0;
@@ -72,7 +72,7 @@
             text-align: center;
             color: #666;
             font-size: 14px;
-            width: 100%; /* Ensure footer takes the full width */
+            width: 100%;
         }
     </style>
 </head>
@@ -141,6 +141,10 @@
 
         const morningDuration = (morningEndTime - morningStartTime) / (1000 * 60); // in minutes
 
+        // Ensure lunch duration is exactly 1 hour (60 minutes)
+        const lunchDuration = 60;
+        const afternoonDelay = (afternoonStartTime - morningEndTime) / (1000 * 60) - lunchDuration; // Calculate deviation from 1 hour lunch
+
         const eightHours = 8 * 60; // 8 hours in minutes
         const remainingTime = eightHours - morningDuration;
 
@@ -152,7 +156,6 @@
         }
 
         const morningDelay = (morningStartTime - standardMorningStart) / (1000 * 60); // in minutes
-        const afternoonDelay = (afternoonStartTime - standardAfternoonStart) / (1000 * 60); // in minutes
         const totalDelay = morningDelay + afternoonDelay;
 
         const endTime = new Date(standardEndTime.getTime() + (totalDelay * 60 * 1000) - (earlyLeaveTime * 60 * 1000) + (lateLeaveTime * 60 * 1000));
@@ -163,11 +166,10 @@
         const endHoursWithTolerance = String(endTimeWithTolerance.getHours()).padStart(2, '0');
         const endMinutesWithTolerance = String(endTimeWithTolerance.getMinutes()).padStart(2, '0');
 
-        const lunchDuration = (afternoonStartTime - morningEndTime) / (1000 * 60); // in minutes
-        const totalWorkedHours = (endTime - morningStartTime - (lunchDuration * 60 * 1000)) / (1000 * 60 * 60); // in hours
+        const totalWorkedHours = (morningDuration + remainingTime) / 60; // in hours
 
         document.getElementById('info-text').innerHTML = `
-            <p>Hora de Almoço: ${Math.floor(lunchDuration / 60)}h ${lunchDuration % 60}min</p>
+            <p>Hora de Almoço: 1h 0min</p>
             <p>Total de Horas Trabalhadas: ${totalWorkedHours.toFixed(2)} horas</p>
             <p>Hora de Saída (Sem Tolerância): ${endHours}:${endMinutes}</p>
             <p>Hora de Saída (Com Tolerância): ${endHoursWithTolerance}:${endMinutesWithTolerance}</p>

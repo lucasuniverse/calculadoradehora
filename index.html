@@ -96,7 +96,7 @@
     </div>
     <div class="form-group">
         <label for="morning-end">Saída da manhã:</label>
-        <input type="time" id="morning-end" value="12:00">
+        <input type="time" id="morning-end" value="12:00" onchange="suggestAfternoonStart()">
     </div>
     <div class="form-group">
         <label for="afternoon-start">Entrada da tarde:</label>
@@ -122,11 +122,28 @@
 </div>
 
 <script>
+    function suggestAfternoonStart() {
+        const morningEnd = document.getElementById('morning-end').value;
+        if (morningEnd) {
+            const morningEndTime = new Date(`1970-01-01T${morningEnd}:00`);
+            const suggestedAfternoonStartTime = new Date(morningEndTime.getTime() + 60 * 60 * 1000);
+            const hours = String(suggestedAfternoonStartTime.getHours()).padStart(2, '0');
+            const minutes = String(suggestedAfternoonStartTime.getMinutes()).padStart(2, '0');
+            document.getElementById('afternoon-start').value = `${hours}:${minutes}`;
+        }
+    }
+
     function calculateEndTime() {
-        const day = document.getElementById('day-select').value;
         const morningStart = document.getElementById('morning-start').value;
         const morningEnd = document.getElementById('morning-end').value;
         const afternoonStart = document.getElementById('afternoon-start').value;
+
+        if (new Date(`1970-01-01T${afternoonStart}:00`) <= new Date(`1970-01-01T${morningEnd}:00`)) {
+            alert("O horário de entrada da tarde não pode ser menor ou igual ao horário de saída da manhã.");
+            return;
+        }
+
+        const day = document.getElementById('day-select').value;
         const earlyLeave = document.getElementById('early-leave').value;
         const lateLeave = document.getElementById('late-leave').value;
 

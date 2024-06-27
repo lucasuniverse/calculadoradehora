@@ -141,6 +141,9 @@
 
         const morningDuration = (morningEndTime - morningStartTime) / (1000 * 60); // in minutes
 
+        // Calculate actual lunch duration
+        const actualLunchDuration = (afternoonStartTime - morningEndTime) / (1000 * 60); // in minutes
+
         // Ensure lunch duration is exactly 1 hour (60 minutes)
         const lunchDuration = 60;
         const afternoonDelay = (afternoonStartTime - morningEndTime) / (1000 * 60) - lunchDuration; // Calculate deviation from 1 hour lunch
@@ -169,7 +172,7 @@
         const totalWorkedHours = (morningDuration + remainingTime) / 60; // in hours
 
         document.getElementById('info-text').innerHTML = `
-            <p>Hora de Almoço: 1h 0min</p>
+            <p>Hora de Almoço: ${Math.floor(actualLunchDuration / 60)}h ${actualLunchDuration % 60}min</p>
             <p>Total de Horas Trabalhadas: ${totalWorkedHours.toFixed(2)} horas</p>
             <p>Hora de Saída (Sem Tolerância): ${endHours}:${endMinutes}</p>
             <p>Hora de Saída (Com Tolerância): ${endHoursWithTolerance}:${endMinutesWithTolerance}</p>

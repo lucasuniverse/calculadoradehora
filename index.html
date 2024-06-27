@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Hora de Saída</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box; /* Ensure padding and border are included in the total width */
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%; /* Ensure form group takes the full width */
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensure padding and border are included in the total width */
+        }
+        button {
+            margin-top: 15px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .info {
+            margin-top: 20px;
+            background-color: #e7f3fe;
+            padding: 10px;
+            border: 1px solid #b3d4fc;
+            border-radius: 4px;
+            width: 100%;
+            min-height: 100px; /* Set a minimum height */
+            box-sizing: border-box; /* Ensure padding and border are included in the total width */
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            width: 100%; /* Ensure footer takes the full width */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora de Hora de Saída</h1>
+    <div class="form-group">
+        <label for="day-select">Selecione o dia:</label>
+        <select id="day-select">
+            <option value="monday">Segunda</option>
+            <option value="tuesday">Terça</option>
+            <option value="wednesday">Quarta</option>
+            <option value="thursday">Quinta</option>
+            <option value="friday">Sexta</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="morning-start">Entrada da manhã:</label>
+        <input type="time" id="morning-start" value="07:30">
+    </div>
+    <div class="form-group">
+        <label for="morning-end">Saída da manhã:</label>
+        <input type="time" id="morning-end" value="12:00">
+    </div>
+    <div class="form-group">
+        <label for="afternoon-start">Entrada da tarde:</label>
+        <input type="time" id="afternoon-start" value="13:00">
+    </div>
+    <div class="form-group">
+        <label for="early-leave">Saída mais cedo:</label>
+        <input type="time" id="early-leave" value="00:00">
+    </div>
+    <div class="form-group">
+        <label for="late-leave">Saída mais tarde:</label>
+        <input type="time" id="late-leave" value="00:00">
+    </div>
+    <button onclick="calculateEndTime()">Calcular Saída da Tarde</button>
+
+    <div class="info" id="info">
+        <p id="info-text">Informações aparecerão aqui...</p>
+    </div>
+</div>
+
+<div class="footer">
+    Desenvolvedor: Lucas Antonio da Silva
+</div>
+
+<script>
+    function calculateEndTime() {
+        const day = document.getElementById('day-select').value;
+        const morningStart = document.getElementById('morning-start').value;
+        const morningEnd = document.getElementById('morning-end').value;
+        const afternoonStart = document.getElementById('afternoon-start').value;
+        const earlyLeave = document.getElementById('early-leave').value;
+        const lateLeave = document.getElementById('late-leave').value;
+
+        const morningStartTime = new Date(`1970-01-01T${morningStart}:00`);
+        const morningEndTime = new Date(`1970-01-01T${morningEnd}:00`);
+        const afternoonStartTime = new Date(`1970-01-01T${afternoonStart}:00`);
+        const earlyLeaveTime = parseTime(earlyLeave);
+        const lateLeaveTime = parseTime(lateLeave);
+
+        const standardMorningStart = new Date(`1970-01-01T07:30:00`);
+        const standardAfternoonStart = new Date(`1970-01-01T13:00:00`);
+
+        const morningDuration = (morningEndTime - morningStartTime) / (1000 * 60); // in minutes
+
+        const eightHours = 8 * 60; // 8 hours in minutes
+        const remainingTime = eightHours - morningDuration;
+
+        let standardEndTime;
+        if (["monday", "tuesday", "wednesday"].includes(day)) {
+            standardEndTime = new Date(`1970-01-01T17:20:00`);
+        } else {
+            standardEndTime = new Date(`1970-01-01T17:15:00`);
+        }
+
+        const morningDelay = (morningStartTime - standardMorningStart) / (1000 * 60); // in minutes
+        const afternoonDelay = (afternoonStartTime - standardAfternoonStart) / (1000 * 60); // in minutes
+        const totalDelay = morningDelay + afternoonDelay;
+
+        const endTime = new Date(standardEndTime.getTime() + (totalDelay * 60 * 1000) - (earlyLeaveTime * 60 * 1000) + (lateLeaveTime * 60 * 1000));
+        const endTimeWithTolerance = new Date(endTime.getTime() - (10 * 60 * 1000)); // 10 minutes tolerance
+
+        const endHours = String(endTime.getHours()).padStart(2, '0');
+        const endMinutes = String(endTime.getMinutes()).padStart(2, '0');
+        const endHoursWithTolerance = String(endTimeWithTolerance.getHours()).padStart(2, '0');
+        const endMinutesWithTolerance = String(endTimeWithTolerance.getMinutes()).padStart(2, '0');
+
+        const lunchDuration = (afternoonStartTime - morningEndTime) / (1000 * 60); // in minutes
+        const totalWorkedHours = (endTime - morningStartTime - (lunchDuration * 60 * 1000)) / (1000 * 60 * 60); // in hours
+
+        document.getElementById('info-text').innerHTML = `
+            <p>Hora de Almoço: ${Math.floor(lunchDuration / 60)}h ${lunchDuration % 60}min</p>
+            <p>Total de Horas Trabalhadas: ${totalWorkedHours.toFixed(2)} horas</p>
+            <p>Hora de Saída (Sem Tolerância): ${endHours}:${endMinutes}</p>
+            <p>Hora de Saída (Com Tolerância): ${endHoursWithTolerance}:${endMinutesWithTolerance}</p>
+        `;
+
+        // Ensure title and info box are visible
+        document.querySelector('.container').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+
+    function parseTime(timeString) {
+        const [hours, minutes] = timeString.split(':').map(Number);
+        return (hours * 60) + minutes;
+    }
+</script>
+
+</body>
+</html>

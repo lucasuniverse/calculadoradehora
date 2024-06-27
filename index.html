@@ -169,11 +169,17 @@
         const endHoursWithTolerance = String(endTimeWithTolerance.getHours()).padStart(2, '0');
         const endMinutesWithTolerance = String(endTimeWithTolerance.getMinutes()).padStart(2, '0');
 
-        const totalWorkedHours = (morningDuration + remainingTime) / 60; // in hours
+        // Calculate total worked hours
+        const afternoonEndTime = new Date(`1970-01-01T${endHours}:${endMinutes}:00`);
+        const afternoonDuration = (afternoonEndTime - afternoonStartTime) / (1000 * 60); // in minutes
+        const totalWorkedMinutes = morningDuration + afternoonDuration;
+
+        const totalWorkedHours = Math.floor(totalWorkedMinutes / 60);
+        const totalWorkedMinutesRemainder = totalWorkedMinutes % 60;
 
         document.getElementById('info-text').innerHTML = `
             <p>Hora de Almoço: ${Math.floor(actualLunchDuration / 60)}h ${actualLunchDuration % 60}min</p>
-            <p>Total de Horas Trabalhadas: ${totalWorkedHours.toFixed(2)} horas</p>
+            <p>Total de Horas Trabalhadas: ${totalWorkedHours}h ${totalWorkedMinutesRemainder}min</p>
             <p>Hora de Saída (Sem Tolerância): ${endHours}:${endMinutes}</p>
             <p>Hora de Saída (Com Tolerância): ${endHoursWithTolerance}:${endMinutesWithTolerance}</p>
         `;
